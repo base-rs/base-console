@@ -10,7 +10,6 @@
 //! core_console::init();
 //! tracing::info!(connections = 3_u64, "Server started");
 //! ```
-
 mod as_console_error;
 mod console;
 mod console_fields;
