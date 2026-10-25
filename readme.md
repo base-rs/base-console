@@ -1,4 +1,4 @@
-# Core Console
+# `core-console`
 
 Automatic terminal and JSON diagnostics for Rust applications using `tracing`.
 
@@ -6,10 +6,10 @@ Console chooses coloured, human-readable output when stderr is a terminal and ne
 
 ## Usage
 
-This is a local prototype. Add the checkout and `tracing` to an application:
+Add Console and `tracing` to an application:
 
 ```sh
-cargo add core-console --path ../core-console
+cargo add core-console
 cargo add tracing
 ```
 
@@ -88,11 +88,30 @@ cargo clippy --workspace --all-targets -- -D warnings
 cargo bake test:coverage --all-targets true
 ```
 
-### Agent Context
+## Releasing
 
-Run `cargo bake agent:context:install` to install shared context and skills. Use `cargo bake agent:context:list` and `cargo bake agent:context:show` to discover guidance. Follow `agents.md` and the installed skills under `.agents/skills/`.
+Prepare a release with `cargo bake cargo:version:patch` (or `minor`, `major`, or `bump --version X.Y.Z`), commit it with a `Release: vVERSION` trailer, then run `cargo bake cargo:release` and open a pull request. After review and merge, GitHub Actions publishes the release when the configured `crates-io` environment approves it, then creates or updates the matching GitHub Release from `releases.md`. Follow the shared [Releasing skill](https://github.com/core-rs/core-project/blob/main/context/releasing.md) for the standard process.
 
 ## Releases
 
-See [releases.md](releases.md) for the initial implementation status.
+<!-- bake-readme:releases:start -->
+See [releases.md](releases.md) for the full release history.
 
+### v0.1.0
+
+- Choose terminal text or newline-delimited JSON automatically for `tracing` events.
+- Preserve typed fields, span context, and error causes through composable or scoped subscribers.
+- Capture failures with optional OS backtraces and logical span traces for later reporting.
+- Follow Rust logging conventions with panicking `init` and fallible `try_init` functions and builder methods.
+<!-- bake-readme:releases:end -->
+
+## See Also
+
+- [`tracing`](https://docs.rs/tracing) provides structured events and spans.
+- [`tracing-subscriber`](https://docs.rs/tracing-subscriber) provides subscriber composition and filtering.
+
+## Contributing
+
+Please open an issue or pull request on [GitHub](https://github.com/core-rs/core-console).
+
+Run `cargo bake agent:context:install` to install shared context and skills for development. Use `cargo bake agent:context:list` and `cargo bake agent:context:show` to discover guidance. Follow `agents.md` and the installed skills under `.agents/skills/`.
