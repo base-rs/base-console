@@ -1,4 +1,4 @@
-# `core-console`
+# `base-console`
 
 Automatic terminal and JSON diagnostics for Rust applications using `tracing`.
 
@@ -9,18 +9,18 @@ Console chooses coloured, human-readable output when stderr is a terminal and ne
 Add Console and `tracing` to an application:
 
 ```sh
-cargo add core-console
+cargo add base-console
 cargo add tracing
 ```
 
 ```rust
 fn main() {
-    core_console::init();
+    base_console::init();
     tracing::info!(connections = 3_u64, "Server started");
 }
 ```
 
-`init` reads `RUST_LOG`, defaulting to `info`, and panics if setup fails. Use `core_console::try_init()?` to handle invalid filters or an already installed global subscriber. Both leave the `log` logger unchanged; applications may explicitly install `tracing_log::LogTracer` to include dependencies using `log`.
+`init` reads `RUST_LOG`, defaulting to `info`, and panics if setup fails. Use `base_console::try_init()?` to handle invalid filters or an already installed global subscriber. Both leave the `log` logger unchanged; applications may explicitly install `tracing_log::LogTracer` to include dependencies using `log`.
 
 Try the demonstration:
 
@@ -42,8 +42,8 @@ tracing::error!(error = &error as &dyn std::error::Error, "Request failed");
 Use `Failure` to capture diagnostics at the point an error is wrapped, then retain or return it for later reporting:
 
 ```rust
-let failure = core_console::Failure::capture(std::io::Error::other("connection closed"));
-core_console::failure!(failure, "Request {} failed", 42);
+let failure = base_console::Failure::capture(std::io::Error::other("connection closed"));
+base_console::failure!(failure, "Request {} failed", 42);
 ```
 
 The macro preserves the caller's target and source location. The wrapper captures a logical span trace when Console's layer is active, and an OS backtrace when `RUST_BACKTRACE` or `RUST_LIB_BACKTRACE` enables it. `Failure::with_backtrace` accepts a previously captured backtrace. Capture before leaving the failing operation: wrapping an error later cannot reconstruct its earlier stack. Logging the wrapper directly as `&dyn Error` preserves its causes; use `failure!` to include its captured traces as well.
@@ -51,13 +51,13 @@ The macro preserves the caller's target and source location. The wrapper capture
 ### Composition and scoped output
 
 ```rust
-use core_console::{Console, OutputFormat};
+use base_console::{Console, OutputFormat};
 use tracing_subscriber::{layer::SubscriberExt, EnvFilter};
 
 let console = Console::default()
     .with_format(OutputFormat::Text)
     .with_ansi(false)
-    .with_filter(EnvFilter::new("info,core_http=debug"));
+    .with_filter(EnvFilter::new("info,base_http=debug"));
 
 let subscriber = tracing_subscriber::registry().with(console.layer());
 tracing::subscriber::with_default(subscriber, || {
@@ -79,7 +79,7 @@ Writing is synchronous. Each console serializes complete records through its wri
 
 ## Development
 
-The private `bake/` package depends on `core-project` for shared tooling:
+The private `bake/` package depends on `base-project` for shared tooling:
 
 ```sh
 cargo bake test
@@ -90,7 +90,7 @@ cargo bake test:coverage --all-targets true
 
 ## Releasing
 
-Prepare a release with `cargo bake cargo:version:patch` (or `minor`, `major`, or `bump --version X.Y.Z`), commit it with a `Release: vVERSION` trailer, then run `cargo bake cargo:release` and open a pull request. After review and merge, GitHub Actions publishes the release when the configured `crates-io` environment approves it, then creates or updates the matching GitHub Release from `releases.md`. Follow the shared [Releasing skill](https://github.com/core-rs/core-project/blob/main/context/releasing.md) for the standard process.
+Prepare a release with `cargo bake cargo:version:patch` (or `minor`, `major`, or `bump --version X.Y.Z`), commit it with a `Release: vVERSION` trailer, then run `cargo bake cargo:release` and open a pull request. After review and merge, GitHub Actions publishes the release when the configured `crates-io` environment approves it, then creates or updates the matching GitHub Release from `releases.md`. Follow the shared [Releasing skill](https://github.com/base-rs/base-project/blob/main/context/releasing.md) for the standard process.
 
 ## Releases
 
@@ -98,6 +98,8 @@ Prepare a release with `cargo bake cargo:version:patch` (or `minor`, `major`, or
 See [releases.md](releases.md) for the full release history.
 
 ### v0.1.0
+
+- Publish as `base-console` in the `base-rs` organization, with package versions starting at 0.1.0.
 
 - Choose terminal text or newline-delimited JSON automatically for `tracing` events.
 - Preserve typed fields, span context, and error causes through composable or scoped subscribers.
@@ -112,6 +114,6 @@ See [releases.md](releases.md) for the full release history.
 
 ## Contributing
 
-Please open an issue or pull request on [GitHub](https://github.com/core-rs/core-console).
+Please open an issue or pull request on [GitHub](https://github.com/base-rs/base-console).
 
 Run `cargo bake agent:context:install` to install shared context and skills for development. Use `cargo bake agent:context:list` and `cargo bake agent:context:show` to discover guidance. Follow `agents.md` and the installed skills under `.agents/skills/`.

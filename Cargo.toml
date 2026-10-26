@@ -1,11 +1,11 @@
 [package]
-name = "core-console"
+name = "base-console"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.85"
 license = "MIT"
-repository = "https://github.com/core-rs/core-console"
-documentation = "https://docs.rs/core-console"
+repository = "https://github.com/base-rs/base-console"
+documentation = "https://docs.rs/base-console"
 description = "Automatic terminal and JSON diagnostics for tracing"
 keywords = ["logging", "tracing", "console", "diagnostics"]
 categories = ["development-tools::debugging"]
@@ -20,7 +20,7 @@ resolver = "3"
 manifest = "bake/Cargo.toml"
 
 [workspace.metadata.bake.release]
-reviewers = ["core-rs/maintainers"]
+reviewers = ["base-rs/maintainers"]
 
 [dependencies]
 serde_json = { version = "1.0.154", features = ["arbitrary_precision"] }

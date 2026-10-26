@@ -5,7 +5,7 @@ use std::process::Command;
 
 #[test]
 fn executable_lists_shared_tasks_and_reports_unknown_tasks() {
-    let output = Command::new(env!("CARGO_BIN_EXE_core-console-bake"))
+    let output = Command::new(env!("CARGO_BIN_EXE_base-console-bake"))
         .arg("--list")
         .output()
         .unwrap();
@@ -14,7 +14,7 @@ fn executable_lists_shared_tasks_and_reports_unknown_tasks() {
     for task in ["agent:context:install", "test:coverage", "cargo:release"] {
         assert!(listing.contains(task), "missing shared task {task}");
     }
-    let output = Command::new(env!("CARGO_BIN_EXE_core-console-bake"))
+    let output = Command::new(env!("CARGO_BIN_EXE_base-console-bake"))
         .arg("unknown-task")
         .output()
         .unwrap();

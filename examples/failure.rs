@@ -1,7 +1,7 @@
 // Released under the MIT License.
 // Copyright, 2026, by Samuel Williams.
 
-use core_console::{Console, Failure, OutputFormat};
+use base_console::{Console, Failure, OutputFormat};
 use std::{backtrace::Backtrace, error::Error, fmt};
 
 #[derive(Debug)]
@@ -52,6 +52,6 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     });
     // The request scope has ended; its captured origin is still available.
-    core_console::failure!(failure, "Request failed");
+    base_console::failure!(failure, "Request failed");
     Ok(())
 }
