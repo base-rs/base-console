@@ -1,7 +1,7 @@
 // Released under the MIT License.
 // Copyright, 2026, by Samuel Williams.
 
-use core_console::{Console, Failure, OutputFormat};
+use base_console::{Console, Failure, OutputFormat};
 use serde_json::Value;
 use std::{
     backtrace::{Backtrace, BacktraceStatus},
@@ -331,7 +331,7 @@ fn captured_failure_keeps_origin_after_span_updates_and_uses_the_callers_target(
             assert_eq!(failure.error().to_string(), "request failed");
             assert_eq!(failure.to_string(), "request failed");
             assert_eq!(failure.source().unwrap().to_string(), "peer reset");
-            core_console::failure!(failure, "Request {} failed", 42);
+            base_console::failure!(failure, "Request {} failed", 42);
             assert_eq!(failure.into_inner().0.to_string(), "peer reset");
         },
     );
@@ -362,7 +362,7 @@ fn supplied_backtrace_is_reported_and_capture_works_without_a_subscriber() {
     let buffer = Buffer::default();
     let failure = Failure::with_backtrace(io::Error::other("captured"), Backtrace::force_capture());
     tracing::subscriber::with_default(buffer.console().subscriber(), || {
-        core_console::failure!(target: "explicit", failure, "Failure");
+        base_console::failure!(target: "explicit", failure, "Failure");
     });
     let records = buffer.records();
     assert_eq!(records[0]["target"], "explicit");
@@ -379,16 +379,16 @@ fn failure_reports_boxed_and_borrowed_error_trait_objects() {
     let buffer = Buffer::default();
     tracing::subscriber::with_default(buffer.console().subscriber(), || {
         let error: Box<dyn Error> = Box::new(RequestError(io::Error::other("boxed")));
-        core_console::failure!(Failure::capture(error), "boxed error");
+        base_console::failure!(Failure::capture(error), "boxed error");
         let error: Box<dyn Error + Send> = Box::new(io::Error::other("send"));
-        core_console::failure!(Failure::capture(error), "send error");
+        base_console::failure!(Failure::capture(error), "send error");
         let error: Box<dyn Error + Sync> = Box::new(io::Error::other("sync"));
-        core_console::failure!(Failure::capture(error), "sync error");
+        base_console::failure!(Failure::capture(error), "sync error");
         let error: Box<dyn Error + Send + Sync> = Box::new(io::Error::other("send and sync"));
-        core_console::failure!(Failure::capture(error), "send sync error");
+        base_console::failure!(Failure::capture(error), "send sync error");
         let error = io::Error::other("borrowed");
         let error: &dyn Error = &error;
-        core_console::failure!(Failure::capture(error), "borrowed error");
+        base_console::failure!(Failure::capture(error), "borrowed error");
     });
     let records = buffer.records();
     assert_eq!(records.len(), 5);
@@ -488,28 +488,28 @@ fn process_probe() {
     };
     match mode.as_str() {
         "emit" => {
-            core_console::init();
+            base_console::init();
             tracing::info!("visible info");
             tracing::warn!("visible warning");
             tracing::debug!("hidden debug");
         }
         "duplicate" => {
-            core_console::try_init().unwrap();
-            let error = core_console::try_init().unwrap_err();
+            base_console::try_init().unwrap();
+            let error = base_console::try_init().unwrap_err();
             assert!(matches!(
                 error,
-                core_console::ConsoleInitError::Subscriber(_)
+                base_console::ConsoleInitError::Subscriber(_)
             ));
             assert!(error.to_string().contains("install"));
             assert!(error.source().is_some());
-            assert!(std::panic::catch_unwind(core_console::init).is_err());
+            assert!(std::panic::catch_unwind(base_console::init).is_err());
         }
         "invalid" => {
-            let error = core_console::try_init().unwrap_err();
-            assert!(matches!(error, core_console::ConsoleInitError::Filter(_)));
+            let error = base_console::try_init().unwrap_err();
+            assert!(matches!(error, base_console::ConsoleInitError::Filter(_)));
             assert!(error.to_string().contains("filter"));
             assert!(error.source().is_some());
-            assert!(std::panic::catch_unwind(core_console::init).is_err());
+            assert!(std::panic::catch_unwind(base_console::init).is_err());
         }
         "configured" => {
             let buffer = Buffer::default();
@@ -533,12 +533,12 @@ fn process_probe() {
             }
             static LOGGER: Logger = Logger;
             log::set_logger(&LOGGER).unwrap();
-            core_console::init();
+            base_console::init();
             assert!(std::ptr::eq(log::logger(), &LOGGER as &dyn log::Log));
         }
         "bridge" => {
             tracing_log::LogTracer::init().unwrap();
-            core_console::init();
+            base_console::init();
             log::info!(target: "legacy_client", "bridged message");
         }
         _ => panic!("unknown probe"),

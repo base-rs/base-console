@@ -7,7 +7,7 @@
 //! For existing subscribers and isolated captures, compose [`Console::layer`] instead.
 //!
 //! ```no_run
-//! core_console::init();
+//! base_console::init();
 //! tracing::info!(connections = 3_u64, "Server started");
 //! ```
 mod as_console_error;
@@ -34,8 +34,8 @@ pub use as_console_error::AsConsoleError as __AsConsoleError;
 /// The error's causes remain typed; captured backtraces and original span context are included as text fields. Ordinary `tracing` subscribers can consume this event too. The failure expression is evaluated once. An explicit `target:` may override the caller's module path.
 ///
 /// ```
-/// let failure = core_console::Failure::capture(std::io::Error::other("disconnected"));
-/// core_console::failure!(failure, "Request {} failed", 42);
+/// let failure = base_console::Failure::capture(std::io::Error::other("disconnected"));
+/// base_console::failure!(failure, "Request {} failed", 42);
 /// ```
 #[macro_export]
 macro_rules! failure {
