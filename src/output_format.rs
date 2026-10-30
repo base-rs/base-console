@@ -9,7 +9,7 @@ pub enum OutputFormat {
     Auto,
     /// Human-readable text, including indented causes and captured diagnostics.
     Text,
-    /// One structured JSON object per line.
+    /// One structured JSON object per line, as described in the [crate output contract](crate#output).
     Json,
 }
 

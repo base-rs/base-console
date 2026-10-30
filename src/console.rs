@@ -51,7 +51,7 @@ impl<W> Console<W> {
         self
     }
 
-    /// Replace the destination. Automatic output treats custom writers as redirected streams, selecting JSON without colour. Use [`Self::with_format`] to request text.
+    /// Replace the destination. Building a layer, subscriber, or global console requires a `Write + Send + 'static` writer. Automatic output treats custom writers as redirected streams, selecting JSON without colour. Use [`Self::with_format`] to request text.
     pub fn with_writer<T>(self, writer: T) -> Console<T> {
         Console {
             writer,
