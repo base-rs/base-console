@@ -48,7 +48,9 @@ base_console::failure!(failure, "Request {} failed", 42);
 
 The macro preserves the caller's target and source location. The wrapper captures a logical span trace when Console's layer is active, and an OS backtrace when `RUST_BACKTRACE` or `RUST_LIB_BACKTRACE` enables it. `Failure::with_backtrace` accepts a previously captured backtrace. Capture before leaving the failing operation: wrapping an error later cannot reconstruct its earlier stack. Logging the wrapper directly as `&dyn Error` preserves its causes; use `failure!` to include its captured traces as well.
 
-### Composition and scoped output
+### Composition
+
+Configure a `Console` and compose its layer with other subscribers, or use it for scoped output:
 
 ```rust
 use base_console::{Console, OutputFormat};
@@ -65,28 +67,7 @@ tracing::subscriber::with_default(subscriber, || {
 });
 ```
 
-`Console::subscriber()` also builds an isolated subscriber directly. Use `Console::init()` or its fallible counterpart `Console::try_init()` to install a configured console globally. `with_writer` accepts a `Write + Send + 'static` destination; automatic output treats custom writers as redirected streams. `with_env_filter` explicitly reads `RUST_LOG` for a configured console. A layer's filter applies only to that layer.
-
-For asynchronous scopes, use `tracing::Instrument` and `tracing::instrument::WithSubscriber` to attach spans and subscribers to futures before spawning them. A thread-local default guard must not be held across `.await`.
-
-### Output contract
-
-JSON includes `timestamp` (UTC), `elapsed_seconds` (process-local console uptime), `level`, `target`, `name`, `location`, `fields`, and a root-to-leaf `spans` array. Each enabled span has a name and its current fields; spans excluded by the console's filter are omitted. Reserved metadata stays separate from user fields. Typed errors are objects containing `message` and an ordered `causes` array; cause traversal stops after 32 entries and sets `truncated` when more remain.
-
-Integer fields, including 128-bit integers, remain JSON numbers. Consumers must support their precision. Non-finite floating-point fields become JSON `null`; `%value` and `?value` remain text representations. Backtraces and captured span traces are text fields. The initial output schema may evolve before a stable release.
-
-Writing is synchronous. Each console serializes complete records through its writer and flushes the destination before logging returns; it starts no background threads and requires no runtime. Text output escapes control characters from messages and diagnostic text, while JSON uses standard string escaping.
-
-## Development
-
-The private `bake/` package depends on `base-project` for shared tooling:
-
-```sh
-cargo bake test
-cargo fmt --all -- --check
-cargo clippy --workspace --all-targets -- -D warnings
-cargo bake test:coverage --all-targets true
-```
+See the [API documentation](https://docs.rs/base-console) for writers, filters, asynchronous scopes, and the JSON output contract.
 
 ## Releasing
 
@@ -115,5 +96,3 @@ See [releases.md](releases.md) for the full release history.
 ## Contributing
 
 Please open an issue or pull request on [GitHub](https://github.com/base-rs/base-console).
-
-Run `cargo bake agent:context:install` to install shared context and skills for development. Use `cargo bake agent:context:list` and `cargo bake agent:context:show` to discover guidance. Follow `agents.md` and the installed skills under `.agents/skills/`.

@@ -10,6 +10,35 @@
 //! base_console::init();
 //! tracing::info!(connections = 3_u64, "Server started");
 //! ```
+//!
+//! # Composition
+//!
+//! [`Console`] configures the format, colour, writer, and filter, then builds a composable [`Console::layer`], an isolated [`Console::subscriber`], or a global installation with [`Console::init`] or [`Console::try_init`]. A console's filter applies only to its own output.
+//!
+//! ```
+//! use base_console::{Console, OutputFormat};
+//! use tracing_subscriber::{layer::SubscriberExt, EnvFilter};
+//!
+//! let console = Console::default()
+//!     .with_format(OutputFormat::Text)
+//!     .with_ansi(false)
+//!     .with_filter(EnvFilter::new("info,base_http=debug"));
+//!
+//! let subscriber = tracing_subscriber::registry().with(console.layer());
+//! tracing::subscriber::with_default(subscriber, || {
+//!     tracing::info!("Scoped output");
+//! });
+//! ```
+//!
+//! For asynchronous scopes, use `tracing::Instrument` and `tracing::instrument::WithSubscriber` to attach spans and subscribers to futures before spawning them. A thread-local default guard must not be held across `.await`.
+//!
+//! # Output
+//!
+//! JSON includes `timestamp` (UTC), `elapsed_seconds` (process-local console uptime), `level`, `target`, `name`, `location`, `fields`, and a root-to-leaf `spans` array. Each enabled span has a name and its current fields; spans excluded by the console's filter are omitted. Reserved metadata stays separate from user fields. Typed errors are objects containing `message` and an ordered `causes` array; cause traversal stops after 32 entries and sets `truncated` when more remain.
+//!
+//! Integer fields, including 128-bit integers, remain JSON numbers. Consumers must support their precision. Non-finite floating-point fields become JSON `null`; `%value` and `?value` remain text representations. Backtraces and captured span traces are text fields. The initial output schema may evolve before a stable release.
+//!
+//! Writing is synchronous. Each console serializes complete records through its writer and flushes the destination before logging returns; it starts no background threads and requires no runtime. Text output escapes control characters from messages and diagnostic text, while JSON uses standard string escaping.
 mod as_console_error;
 mod console;
 mod console_fields;
