@@ -76,6 +76,7 @@ Prepare a release with `cargo bake cargo:version:patch` (or `minor`, `major`, or
 ## Releases
 
 <!-- bake-readme:releases:start -->
+
 See [releases.md](releases.md) for the full release history.
 
 ### v0.1.0
@@ -85,6 +86,7 @@ See [releases.md](releases.md) for the full release history.
 - Preserve typed fields, span context, and error causes through composable or scoped subscribers.
 - Capture failures with optional OS backtraces and logical span traces for later reporting.
 - Follow Rust logging conventions with panicking `init` and fallible `try_init` functions and builder methods.
+
 <!-- bake-readme:releases:end -->
 
 ## See Also
