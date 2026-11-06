@@ -71,6 +71,8 @@ fn json_preserves_typed_fields_and_call_site_metadata() {
             debt = -3_i64,
             large = u128::MAX,
             negative = i128::MIN,
+            narrow = u128::from(u64::MAX),
+            narrow_negative = i128::from(i64::MIN),
             ratio = 0.5_f64,
             non_finite = f64::INFINITY,
             reused = true,
@@ -99,14 +101,24 @@ fn json_preserves_typed_fields_and_call_site_metadata() {
     let fields = &record["fields"];
     assert_eq!(fields["count"].as_u64(), Some(u64::MAX));
     assert_eq!(fields["debt"], -3);
-    assert_eq!(
-        fields["large"].as_number().unwrap().as_u128(),
-        Some(u128::MAX)
-    );
-    assert_eq!(
-        fields["negative"].as_number().unwrap().as_i128(),
-        Some(i128::MIN)
-    );
+    assert_eq!(fields["narrow"].as_u64(), Some(u64::MAX));
+    assert_eq!(fields["narrow_negative"].as_i64(), Some(i64::MIN));
+    #[cfg(feature = "arbitrary-precision")]
+    {
+        assert_eq!(
+            fields["large"].as_number().unwrap().as_u128(),
+            Some(u128::MAX)
+        );
+        assert_eq!(
+            fields["negative"].as_number().unwrap().as_i128(),
+            Some(i128::MIN)
+        );
+    }
+    #[cfg(not(feature = "arbitrary-precision"))]
+    {
+        assert_eq!(fields["large"], u128::MAX.to_string());
+        assert_eq!(fields["negative"], i128::MIN.to_string());
+    }
     assert_eq!(fields["ratio"], 0.5);
     assert!(fields["non_finite"].is_null());
     assert_eq!(fields["reused"], true);

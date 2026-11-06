@@ -6,7 +6,7 @@ Console consumes ordinary `tracing` events and provides automatic terminal text 
 
 Global initialization follows Rust logging conventions: `init` panics on setup failure, while `try_init` returns an error. This applies to the convenience functions and configured console methods.
 
-Primitive event and span fields retain their types in JSON. Typed error fields preserve the error message and ordered cause chain. Text output presents those causes and supplied diagnostic traces with indentation. A captured failure retains its diagnostic origin when the error is reported later. Diagnostics that were never captured cannot be recovered by the formatter.
+Primitive event and span fields retain their types in JSON. An integer wider than 64 bits is recorded as a decimal string, because serde_json writes it as a number only with `arbitrary_precision`, which changes number handling for every serde_json user in a build and which most JSON consumers cannot represent exactly. The optional `arbitrary-precision` feature enables that serde_json feature and records such integers as numbers; Console never depends on it by default. Typed error fields preserve the error message and ordered cause chain. Text output presents those causes and supplied diagnostic traces with indentation. A captured failure retains its diagnostic origin when the error is reported later. Diagnostics that were never captured cannot be recovered by the formatter.
 
 ## Rationale
 

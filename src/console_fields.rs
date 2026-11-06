@@ -54,10 +54,18 @@ impl Visit for FieldVisitor {
         self.0.insert(field.name().into(), json!(value));
     }
     fn record_i128(&mut self, field: &Field, value: i128) {
-        self.0.insert(field.name().into(), json!(value));
+        let value = match i64::try_from(value) {
+            Ok(value) => json!(value),
+            Err(_) => wide_i128(value),
+        };
+        self.0.insert(field.name().into(), value);
     }
     fn record_u128(&mut self, field: &Field, value: u128) {
-        self.0.insert(field.name().into(), json!(value));
+        let value = match u64::try_from(value) {
+            Ok(value) => json!(value),
+            Err(_) => wide_u128(value),
+        };
+        self.0.insert(field.name().into(), value);
     }
     fn record_bool(&mut self, field: &Field, value: bool) {
         self.0.insert(field.name().into(), json!(value));
@@ -87,4 +95,25 @@ impl Visit for FieldVisitor {
         }
         self.0.insert(field.name().into(), error);
     }
+}
+
+// Integers wider than 64 bits are JSON numbers with `arbitrary-precision`; otherwise they are decimal strings, because serde_json cannot represent them as numbers.
+#[cfg(feature = "arbitrary-precision")]
+fn wide_i128(value: i128) -> Value {
+    json!(value)
+}
+
+#[cfg(feature = "arbitrary-precision")]
+fn wide_u128(value: u128) -> Value {
+    json!(value)
+}
+
+#[cfg(not(feature = "arbitrary-precision"))]
+fn wide_i128(value: i128) -> Value {
+    json!(value.to_string())
+}
+
+#[cfg(not(feature = "arbitrary-precision"))]
+fn wide_u128(value: u128) -> Value {
+    json!(value.to_string())
 }
