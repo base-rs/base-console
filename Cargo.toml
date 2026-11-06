@@ -1,6 +1,6 @@
 [package]
 name = "base-console"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 rust-version = "1.85"
 license = "MIT"
@@ -22,8 +22,12 @@ manifest = "bake/Cargo.toml"
 [workspace.metadata.bake.release]
 reviewers = ["base-rs/maintainers"]
 
+[features]
+# Record integers wider than 64 bits as JSON numbers. Requires serde_json's `arbitrary_precision`, which changes how every serde_json user in the build handles numbers.
+arbitrary-precision = ["serde_json/arbitrary_precision"]
+
 [dependencies]
-serde_json = { version = "1.0.154", features = ["arbitrary_precision"] }
+serde_json = "1.0.154"
 tracing = { version = "0.1.44", default-features = false, features = ["std"] }
 tracing-error = "0.2.1"
 tracing-log = "0.2"

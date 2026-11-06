@@ -79,6 +79,11 @@ Prepare a release with `cargo bake cargo:version:patch` (or `minor`, `major`, or
 
 See [releases.md](releases.md) for the full release history.
 
+### v0.1.1
+
+- Record integers wider than 64 bits as decimal strings by default, and add an optional `arbitrary-precision` feature that records them as JSON numbers.
+- Stop enabling `serde_json`'s `arbitrary_precision` by default, because it changes number handling for every `serde_json` user in a build.
+
 ### v0.1.0
 
 - Publish as `base-console` in the `base-rs` organization, with package versions starting at 0.1.0.
