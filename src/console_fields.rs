@@ -98,22 +98,24 @@ impl Visit for FieldVisitor {
 }
 
 // Integers wider than 64 bits are JSON numbers with `arbitrary-precision`; otherwise they are decimal strings, because serde_json cannot represent them as numbers.
-#[cfg(feature = "arbitrary-precision")]
 fn wide_i128(value: i128) -> Value {
-    json!(value)
+    #[cfg(feature = "arbitrary-precision")]
+    {
+        json!(value)
+    }
+    #[cfg(not(feature = "arbitrary-precision"))]
+    {
+        json!(value.to_string())
+    }
 }
 
-#[cfg(feature = "arbitrary-precision")]
 fn wide_u128(value: u128) -> Value {
-    json!(value)
-}
-
-#[cfg(not(feature = "arbitrary-precision"))]
-fn wide_i128(value: i128) -> Value {
-    json!(value.to_string())
-}
-
-#[cfg(not(feature = "arbitrary-precision"))]
-fn wide_u128(value: u128) -> Value {
-    json!(value.to_string())
+    #[cfg(feature = "arbitrary-precision")]
+    {
+        json!(value)
+    }
+    #[cfg(not(feature = "arbitrary-precision"))]
+    {
+        json!(value.to_string())
+    }
 }
